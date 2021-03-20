@@ -42,7 +42,7 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 
 ### 4、测试
 
-    ./(inferYoloCuda  -e yolov4-csp.trt -i 你的图片 -show -save
+    ./inferYoloCuda  -e yolov4-csp.trt -i 你的图片 -show -save
 
 ## 速度效果
 
