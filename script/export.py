@@ -3,6 +3,7 @@ import models
 from models.models import *
 
 
+models.models.ONNX_EXPORT=True
 cfg = "models/yolov4-csp.cfg"
 checkpoint = "yolov4-csp.weights"
 

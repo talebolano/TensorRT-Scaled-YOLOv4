@@ -18,12 +18,11 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 ## 快速开始
 
 ### 1、生成onnx模型
-	git clone https://github.com/WongKinYiu/ScaledYOLOv4/tree/yolov4-csp
+	git clone --branch yolov4-csp https://github.com/WongKinYiu/ScaledYOLOv4
 	git clone https://github.com/talebolano/TensorRT-Scaled-YOLOv4
-	cp TensorRT-Scaled-YOLOv4/script/models.py yolov4-csp/models/
-	cp TensorRT-Scaled-YOLOv4/script/export.py yolov4-csp/
-	下载yolov4-csp.weights
-	cd yolov4-csp
+	cp TensorRT-Scaled-YOLOv4/script/* ScaledYOLOv4/
+	下载yolov4-csp.weights到ScaledYOLOv4/
+	cd ScaledYOLOv4
 	python3 export.py
 
 
@@ -38,7 +37,7 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 
 ### 3、转换onnx模型到trt模型
 
-    ./makeCudaEngine -i ../../yolov4-csp/yolov4-csp.onnx -o yolov4-csp.trt
+    ./makeCudaEngine -i ../../ScaledYOLOv4/yolov4-csp.onnx -o yolov4-csp.trt
 
 ### 4、测试
 
