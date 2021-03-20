@@ -261,7 +261,7 @@ class YOLOLayer(nn.Module):
             xy *= self.stride
             wh *= self.stride          
 
-            return io[...,4], io[...,5:],xy , wh # conf cls xy wh
+            return io[...,4:5], io[...,5:],xy , wh # conf cls xy wh
 
         else:  # inference
             io = p.sigmoid()
