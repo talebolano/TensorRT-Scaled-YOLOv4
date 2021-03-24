@@ -90,3 +90,9 @@ FP16 | xavier  | 35ms | -
 
 	python3 export.py
 	./makeCudaEngine -i ../../ScaledYOLOv4/yolov4-csp.onnx -o yolov4-csp.trt
+
+4、测试
+
+	./inferYoloCuda  -e yolov4-csp.trt -i 你的图片 -show -save
+
+### 注意：在xavier中使用mish插件要比不使用慢10ms以上。
