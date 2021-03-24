@@ -1,4 +1,5 @@
 #include "trt.h"
+#include "mish.h"
 
 static Logger gLogger;                                                                           
 
@@ -35,7 +36,7 @@ namespace Tn{
 
     onnx2tensorrt::onnx2tensorrt(std::string &onnxfFile,int maxBatchSize,std::string &califilename,Tn::RUN_MODE mode){
         cudaSetDevice(0);
-
+        initMishPlugin();
         auto builder = nvUniquePtr<nvinfer1::IBuilder>(nvinfer1::createInferBuilder(gLogger.getTRTLogger()));
         if(!builder){
             exit(EXIT_FAILURE);
@@ -108,6 +109,7 @@ namespace Tn{
     onnx2tensorrt::onnx2tensorrt(std::string &enginfFile){
 
         cudaSetDevice(0);
+        initMishPlugin();
         std::fstream file;
         file.open(enginfFile,std::ios::binary|std::ios::in);
         if(!file.is_open()){

@@ -14,5 +14,6 @@ load_darknet_weights(model, checkpoint)
 x = torch.randn(1,3,640,640)
 
 torch.onnx.export(
-    model,x,"yolov4-csp.onnx",verbose=True,input_names=['input'],output_names=['conf','cls','bbox']
+    model,x,"yolov4-csp.onnx",verbose=True,input_names=['input'],output_names=['conf','cls','bbox'],
+    operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK
 )

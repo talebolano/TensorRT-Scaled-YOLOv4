@@ -146,6 +146,10 @@ class SwishImplementation(torch.autograd.Function):
 
 class MishImplementation(torch.autograd.Function):
     @staticmethod
+    def symbolic(g,input):
+        return g.op("Mish",input)
+
+    @staticmethod
     def forward(ctx, x):
         ctx.save_for_backward(x)
         return x.mul(torch.tanh(F.softplus(x)))  # x * tanh(ln(1 + exp(x)))

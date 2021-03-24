@@ -50,3 +50,43 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 FP16 | V100 | 12ms | -
 FP16 | xavier  | 35ms | -
 
+## 使用mish插件层
+
+1、下载TensorRT的开源版，在builtin_op_importers.cpp中注册Mish插件。将以下代码粘贴到builtin_op_importers.cpp底部
+
+	DEFINE_BUILTIN_OP_IMPORTER(Mish)
+	{
+    	ASSERT(inputs.at(0).is_tensor(),  nvonnxparser::ErrorCode::kUNSUPPORTED_NODE); // input
+    	std::vector<nvinfer1::ITensor*> tensors;
+    	nvinfer1::ITensor* input = &convertToTensor(inputs.at(0),ctx);
+    	tensors.push_back(input);
+    
+    	const std::string pluginName = "Mish_TRT";
+    	const std::string pluginVersion = "001";
+    	std::vector<nvinfer1::PluginField> f;
+
+    	const auto mPluginRegistry = getPluginRegistry();
+    	const auto pluginCreator
+    	    = mPluginRegistry->getPluginCreator(pluginName.c_str(), pluginVersion.c_str(), "");
+    	nvinfer1::PluginFieldCollection fc;
+    	fc.nbFields = f.size();
+    	fc.fields = f.data();
+    	nvinfer1::IPluginV2* plugin = pluginCreator->createPlugin(node.name().c_str(), &fc);
+
+    	ASSERT(plugin != nullptr && "Mish plugin was not found in the plugin registry!",
+        ErrorCode::kUNSUPPORTED_NODE);
+    	nvinfer1::IPluginV2Layer* layer = ctx->network()->addPluginV2(tensors.data(), tensors.size(), *plugin);
+    	RETURN_ALL_OUTPUTS(layer);
+	}
+
+2、在ScaledYOLOv4/models/models.py中使用MishImplementation()替代Mish()，将
+
+	modules.add_module('activation', Mish())
+替换为
+
+	modules.add_module('activation', MishImplementation())
+
+3、生成onnx模型并转换为trt模型
+
+	python3 export.py
+	./makeCudaEngine -i ../../ScaledYOLOv4/yolov4-csp.onnx -o yolov4-csp.trt
