@@ -50,6 +50,9 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 FP16 | V100 | 12ms | -
 FP16 | xavier  | 35ms | -
 
+
+<img src="./data/result.jpg" width="500px"></img>
+
 ## 使用mish插件层
 
 1、下载TensorRT的开源版，在builtin_op_importers.cpp中注册Mish插件。将以下代码粘贴到builtin_op_importers.cpp底部
@@ -74,7 +77,7 @@ FP16 | xavier  | 35ms | -
     	nvinfer1::IPluginV2* plugin = pluginCreator->createPlugin(node.name().c_str(), &fc);
 
     	ASSERT(plugin != nullptr && "Mish plugin was not found in the plugin registry!",
-        ErrorCode::kUNSUPPORTED_NODE);
+        	ErrorCode::kUNSUPPORTED_NODE);
     	nvinfer1::IPluginV2Layer* layer = ctx->network()->addPluginV2(tensors.data(), tensors.size(), *plugin);
     	RETURN_ALL_OUTPUTS(layer);
 	}

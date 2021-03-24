@@ -52,7 +52,7 @@ MESSAGE(STATUS "found cuda header so at ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES
 
 find_library(TENSORRT_INFER libnvinfer.so
             HINTS ${TENSORRT_ROOT} ${CUDA_TOOLKIT_ROOT_DIR}
-            PATH_SUFFIXES lib lib64 lib/x64) # 在指定目录下找库，并保存在变量里  hints为除了默认位置还要找指定位置 PATH_SUFFIXES指定其他子目录以检测每个目录下的其他位置
+            PATH_SUFFIXES lib lib64 lib/x64) 
 
 find_library(TENSORRT_ONNX libnvonnxparser.so
             HINTS ${TENSORRT_ROOT} ${CUDA_TOOLKIT_ROOT_DIR}
