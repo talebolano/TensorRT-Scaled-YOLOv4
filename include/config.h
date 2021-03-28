@@ -13,23 +13,23 @@ const float vis_thresh=0.5;
 const float nms_thresh=0.45;
 
 const int inputsize[2] = {640,640};
-
+const int num_anchors = 3; 
 const int classes = 80;
 const int yolo1[2] = {inputsize[0] / 32, inputsize[1] /32};
 const int yolo2[2] = {inputsize[0] / 16, inputsize[1] /16};
 const int yolo3[2] = {inputsize[0] / 8, inputsize[1] /8};
-
+// if yolo model have 4 output(like yolov4-p6) add const int yolo4[2] = {inputsize[0] / 16, inputsize[1] /16};
 
 const int yolo1_num = getArraylen(yolo1);
 const int yolo2_num = getArraylen(yolo2);
 const int yolo3_num = getArraylen(yolo3);
-
+// if yolo model have 4 output(like yolov4-p6) add const int yolo4_num = getArraylen(yolo4);
 const int yolo1_size = std::accumulate(yolo1,yolo1+yolo1_num,1,std::multiplies<int64_t>());
 const int yolo2_size = std::accumulate(yolo2,yolo2+yolo2_num,1,std::multiplies<int64_t>());
 const int yolo3_size = std::accumulate(yolo3,yolo3+yolo3_num,1,std::multiplies<int64_t>());
-
-const int yolo_size = 3*(yolo1_size+yolo2_size+yolo3_size);
-
+// if yolo model have 4 output(like yolov4-p6) add const int yolo4_size = std::accumulate(yolo4,yolo4+yolo4_num,1,std::multiplies<int64_t>());
+const int yolo_size = num_anchors*(yolo1_size+yolo2_size+yolo3_size);
+// if yolo model have 4 output(like yolov4-p6) change as const int yolo_size = num_anchors*(yolo1_size+yolo2_size+yolo3_size+yolo4_size);
 const std::string input_name = "input";
 const std::string output_names[3] = {"conf","cls","bbox"};
 

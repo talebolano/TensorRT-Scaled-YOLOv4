@@ -10,9 +10,10 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 
 ## 测试环境
 
-    ubuntu 18.04 
+    ubuntu 18.04
+    pytorch 1.7.1 
     jetpack 4.4
-    CUDA 10.0
+    CUDA 11.0
     TensorRT7.1
 
 ## 快速开始
@@ -20,7 +21,7 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 ### 1、生成onnx模型
 	git clone --branch yolov4-csp https://github.com/WongKinYiu/ScaledYOLOv4
 	git clone https://github.com/talebolano/TensorRT-Scaled-YOLOv4
-	cp TensorRT-Scaled-YOLOv4/script/* ScaledYOLOv4/
+	cp TensorRT-Scaled-YOLOv4/script/ScaledYOLOv4-csp/* ScaledYOLOv4/
 	下载yolov4-csp.weights到ScaledYOLOv4/
 	cd ScaledYOLOv4
 	python3 export.py
@@ -47,7 +48,7 @@ TensorRT for Scaled YOLOv4(yolov4-csp.cfg)
 
  Mode | GPU | inference time | Ap
 ---:|:---:|:---:|:---:
-FP16 | V100 | 12ms | -
+FP16 | V100 | 10ms | -
 FP16 | xavier  | 35ms | -
 
 
