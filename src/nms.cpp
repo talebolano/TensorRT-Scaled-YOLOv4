@@ -137,10 +137,10 @@ void vis(cv::Mat &img,vector<vector<float>>result,string outputName,bool show,bo
         int y2 = (int)((*iter)[3] - shiftY) * scaleY;
 
         cv::Rect bbox;
-        bbox.x = x1;
-        bbox.y = y1;
-        bbox.width = x2-x1;
-        bbox.height = y2-y1;
+        bbox.x = max(x1,0);
+        bbox.y = max(y1,0);
+        bbox.width = min(x2-x1,oriW);
+        bbox.height = min(y2-y1,oriH);
 
         int labelindex = (int)(*iter)[5];
         string showText = class_names[labelindex];
