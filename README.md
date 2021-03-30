@@ -99,4 +99,5 @@ FP16 | xavier  | 35ms | -
 
 	./inferYoloCuda  -e yolov4-csp.trt -i 你的图片 -show -save
 
-### 注意：在xavier中使用mish插件要比不使用慢10ms以上。
+
+注意：在xavier中使用mish插件要比不使用慢10ms以上，原因是tensorrt7在生成engine时会自动对softplus、tanh、mul层（这三个层合起来就是mish层，mish = x*tanh(sofplus(x))）进行整合，而tensorrt6则不会进行这种整合，因此在tensorrt6中使用mish插件有可能会提升推理速度。
