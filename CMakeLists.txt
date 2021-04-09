@@ -80,6 +80,3 @@ target_link_libraries(makeCudaEngine ${OpenCV_LIBS} Tnyolo)
 
 ADD_EXECUTABLE(inferYoloCuda inference.cpp )
 target_link_libraries(inferYoloCuda ${OpenCV_LIBS} Tnyolo)
-
-ADD_EXECUTABLE(inferYoloSegm inference_all.cpp )
-target_link_libraries(inferYoloSegm ${OpenCV_LIBS} Tnyolo)
