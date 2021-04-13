@@ -256,10 +256,10 @@ class YOLOLayer(nn.Module):
 
             p = p.view(m, self.no)
             io = p.sigmoid()
-            xy = (io[..., :2] * 2. - 0.5 + grid)
-            wh = (io[..., 2:4] * 2) ** 2 * anchor_wh
-            xy *= self.stride
-            wh *= self.stride          
+            xy = (io[..., :2] * torch.tensor([2.]) - torch.tensor([0.5]) + grid)
+            wh = (io[..., 2:4] * torch.tensor([2.])) ** torch.tensor([2.]) * anchor_wh
+            xy *= torch.tensor([self.stride]).float()
+            wh *= torch.tensor([self.stride]).float()          
 
             return io[...,4:5], io[...,5:],xy , wh # conf cls xy wh
 

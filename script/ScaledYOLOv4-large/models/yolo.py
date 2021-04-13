@@ -53,8 +53,8 @@ class Detect(nn.Module):
                     anchor_grid = torch.from_numpy(self.anchor_grid[i].numpy())
                     stride = int(self.stride[i])
                     y = x[i].sigmoid()
-                    xy = (y[..., 0:2] * 2. - 0.5 + grid) * stride  # xy
-                    wh = (y[..., 2:4] * 2) ** 2 * anchor_grid  # wh
+                    xy = (y[..., 0:2] * torch.tensor([2.]) - torch.tensor([0.5]) + grid) * torch.tensor([stride]).float()  # xy
+                    wh = (y[..., 2:4] * torch.tensor([2.])) ** torch.tensor([2.]) * anchor_grid  # wh
                     xy = xy.view(bs, middle, 2) 
                     wh = wh.view(bs, middle, 2)
                     conf = y[...,4:5].view(bs, middle, 1)
