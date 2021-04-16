@@ -35,9 +35,13 @@ if __name__ == "__main__":
 
     scaledh = opt.h/(2**(2+numup))
     scaledw = opt.w/(2**(2+numup))
-    for i,m in enumerate(model.model):
+    for index,m in enumerate(model.model):
         if isinstance(m,nn.Upsample):
-            model.model[i] = nn.Upsample(size=(scaledh,scaledw))
+            f = m.f
+            i = m.i
+            model.model[index] = nn.Upsample(size=(scaledh,scaledw))
+            model.model[index].f =f
+            model.model[index].i =i
             scaledw *= 2
             scaledh *= 2    
 
