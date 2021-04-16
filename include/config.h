@@ -18,7 +18,7 @@ const int classes = 80;
 const int yolo1[2] = {inputsize[0] / 32, inputsize[1] /32};
 const int yolo2[2] = {inputsize[0] / 16, inputsize[1] /16};
 const int yolo3[2] = {inputsize[0] / 8, inputsize[1] /8};
-// if yolo model have 4 output(like yolov4-p6) add const int yolo4[2] = {inputsize[0] / 16, inputsize[1] /16};
+// if yolo model have 4 output(like yolov4-p6) add const int yolo4[2] = {inputsize[0] / 64, inputsize[1] /64};
 
 const int yolo1_num = getArraylen(yolo1);
 const int yolo2_num = getArraylen(yolo2);
