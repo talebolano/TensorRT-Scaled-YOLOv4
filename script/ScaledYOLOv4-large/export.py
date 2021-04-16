@@ -33,8 +33,8 @@ if __name__ == "__main__":
         if isinstance(m,nn.Upsample):
             numup += 1
 
-    scaledh = opt.h/(2**(2+numup))
-    scaledw = opt.w/(2**(2+numup))
+    scaledh = int(opt.h/(2**(2+numup)))
+    scaledw = int(opt.w/(2**(2+numup)))
     for index,m in enumerate(model.model):
         if isinstance(m,nn.Upsample):
             f = m.f
