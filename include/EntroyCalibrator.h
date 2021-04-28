@@ -1,12 +1,10 @@
 #ifndef _ENTROY_CALIBRATOR_H_
 #define _ENTROY_CALIBRATOR_H_
 
-#include"NvInfer.h"
-#include"config.h"
-#include"util.h"
-#include<vector>
-#include<string>
-#include<opencv2/opencv.hpp>
+#include "NvInfer.h"
+#include <vector>
+#include <string>
+#include "opencv2/opencv.hpp"
 
 namespace nvinfer1{
 class INt8EntroyCalibrator : public IInt8EntropyCalibrator2

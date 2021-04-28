@@ -3,6 +3,8 @@
 
 #include<numeric>
 #include<string>
+
+
 template<class T>
 int getArraylen(T& array){
     return sizeof(array)/sizeof(array[0]);

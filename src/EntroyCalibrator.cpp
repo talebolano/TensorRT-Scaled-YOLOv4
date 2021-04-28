@@ -1,11 +1,12 @@
-#include"EntroyCalibrator.h"
-#include<cuda.h>
-#include"util.h"
-#include"resize.h"
-#include<cuda_runtime.h>
-#include<iostream>
-#include<fstream>
-#include<iterator>
+#include "EntroyCalibrator.h"
+#include "cuda.h"
+#include "config.h"
+#include "util.h"
+#include "resize.h"
+#include "cuda_runtime.h"
+#include <iostream>
+#include <fstream>
+#include <iterator>
 
 namespace nvinfer1{
     INt8EntroyCalibrator::INt8EntroyCalibrator(int batchsize,std::string caliimagelist, std::string filename,bool readCache)

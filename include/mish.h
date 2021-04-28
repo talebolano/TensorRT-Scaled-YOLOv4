@@ -1,14 +1,10 @@
 #ifndef _MISH_H_
 #define _MISH_H_
 
-#include <NvInfer.h>
+#include "NvInfer.h"
 #include <string>
-#include <NvInferPlugin.h>
-#include <NvInferRuntimeCommon.h>
-#include <cuda_runtime.h>
-#include <device_launch_parameters.h>
-#include "cublas_v2.h"
-#include <cuda_fp16.h>
+#include "NvInferPlugin.h"
+#include "cuda_fp16.h"
 #include <vector>
 
 using namespace nvinfer1;

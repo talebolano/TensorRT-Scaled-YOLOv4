@@ -1,9 +1,9 @@
 #ifndef __TN_UTIL_H_
 #define __TN_UTIL_H_
 
-#include<NvInfer.h>
-#include<iostream>
-#include<assert.h>
+#include "NvInfer.h"
+#include <iostream>
+#include "assert.h"
 
 #ifndef CHECK
 #define CHECK(status)                                                               \                                           

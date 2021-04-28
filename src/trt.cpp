@@ -1,5 +1,21 @@
 #include "trt.h"
 #include "mish.h"
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <ostream>
+#include "NvOnnxConfig.h"
+#include "NvOnnxParser.h"
+#include <numeric>
+#include <algorithm>
+#include "resize.h"
+#include "util.h"
+#include "NvInferPlugin.h"
+#include "post.h"
+#include "EntroyCalibrator.h"
+#include "cuda_runtime.h"
+#include "config.h"
+
 
 static Logger gLogger;                                                                           
 

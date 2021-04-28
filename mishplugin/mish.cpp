@@ -1,7 +1,6 @@
 #include "mish.h"
 #include <iostream>
-#include <assert.h>
-#include <cuda_fp16.h>
+#include "assert.h"
 
 namespace {
     constexpr const char* MISH_PLUGIN_VERSION{"001"};

@@ -66,10 +66,12 @@ MESSAGE(STATUS "found tensorrt infer so at ${TENSORRT_INFER}")
 MESSAGE(STATUS "found tensorrt onnx so at ${TENSORRT_ONNX}")
 MESSAGE(STATUS "found tensorrt plugin so at ${TENSORRT_PLUGIN}")
 
-add_subdirectory(mishplugin) # 添加需要编译的子文件夹
-add_subdirectory(src) # 添加需要编译的子文件夹
+add_subdirectory(mishplugin) 
+add_subdirectory(src) 
+add_subdirectory(mot) 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/mot)
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 include_directories(${OPENCV_INCLUDE_DIRS})
 
@@ -80,3 +82,6 @@ target_link_libraries(makeCudaEngine ${OpenCV_LIBS} Tnyolo)
 
 ADD_EXECUTABLE(inferYoloCuda inference.cpp )
 target_link_libraries(inferYoloCuda ${OpenCV_LIBS} Tnyolo)
+
+ADD_EXECUTABLE(inferYoloMot inference_mot.cpp )
+target_link_libraries(inferYoloMot ${OpenCV_LIBS} Tnyolo SortMot)

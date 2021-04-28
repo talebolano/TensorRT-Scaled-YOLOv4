@@ -1,5 +1,6 @@
 #include "nms.h"
-
+#include "config.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -112,7 +113,7 @@ vector<vector<float>> nms(float*conf,float*cls,float*bbox, int ind_size){
 }
 
 
-void vis(cv::Mat &img,vector<vector<float>>result,string outputName,bool show,bool write){
+void vis(cv::Mat &img,vector<vector<float>>result){
 
     cv::Size oriImgSize = img.size();
     int oriH = oriImgSize.height;
@@ -151,21 +152,12 @@ void vis(cv::Mat &img,vector<vector<float>>result,string outputName,bool show,bo
         cv::putText(img,showText,cv::Point(x1,y1-size.height),cv::FONT_HERSHEY_COMPLEX, label_scale , labelColor(labelindex), box_think*2/3, 8, 0);
     }
 
-    if(write){
-        cv::imwrite(outputName,img);
-    }
-
-    if(show){
-        cv::imshow("output",img);
-        cv::waitKey(0);
-    }
-
     return;
 
 }
 
 
-void vis(cv::VideoWriter &videowriter,cv::Mat &img,vector<vector<float>>result,string outputName,bool show,bool write){
+void plottrack(cv::Mat &img,vector<vector<float>>result){
 
     cv::Size oriImgSize = img.size();
     int oriH = oriImgSize.height;
@@ -197,22 +189,15 @@ void vis(cv::VideoWriter &videowriter,cv::Mat &img,vector<vector<float>>result,s
 
         int labelindex = (int)(*iter)[5];
         string showText = class_names[labelindex];
-        float conf = (*iter)[4];
 
+        float conf = (*iter)[4];
+        int track_id =(int)(*iter)[6];
+
+        showText += string(" id: ")+to_string(track_id);
         cv::rectangle(img,bbox,labelColor(labelindex),box_think);
         auto size = cv::getTextSize(showText,cv::FONT_HERSHEY_COMPLEX,label_scale,1,&base_line);
         cv::putText(img,showText,cv::Point(x1,y1-size.height),cv::FONT_HERSHEY_COMPLEX, label_scale , labelColor(labelindex), box_think*2/3, 8, 0);
     }
-    if(write){
-        videowriter.write(img);
-    }
-
-    if(show){
-        cv::imshow("output",img);
-        cv::waitKey(5);
-    }
-
     return;
-    
 
 }

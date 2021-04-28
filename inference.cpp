@@ -1,10 +1,14 @@
-#include <getopt.h>
-#include <numeric>
+#include "getopt.h"
 #include <chrono>
-#include "include/config.h"
-#include "include/nms.h"
-#include "include/trt.h"
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include "config.h"
+#include "nms.h"
+#include "trt.h"
 
+using namespace std;
 
 int main(int argc, char* argv[]){
 
@@ -80,19 +84,17 @@ int main(int argc, char* argv[]){
         
         if(ind_size>0){
             vector<vector<float>> reslut = nms(conf,cls,bbox,ind_size);
-            vis(inputimage,reslut,output_name,show,save);
+            vis(inputimage,reslut);
         }
-        else
-        {
-            if(save){
-                cv::imwrite(output_name,inputimage);
-            }
-            if(show) {
-                cv::imshow("output",inputimage);
-		cv::waitKey(0);
-            }
-                    
+
+        if(save){
+            cv::imwrite(output_name,inputimage);
         }
+        if(show) {
+            cv::imshow("output",inputimage);
+		    cv::waitKey(0);
+        }
+
         free(conf);
         free(cls);
         free(bbox);
@@ -153,18 +155,15 @@ int main(int argc, char* argv[]){
             
             if(ind_size>0){
                 vector<vector<float>> reslut = nms(conf,cls,bbox,ind_size);
-                vis(writer,input_image,reslut,output_name,show,save);
+                vis(input_image,reslut);
             }
-            else
-            {
-                if(show) {
-                    cv::imshow("output",input_image);
-                    cv::waitKey(5);
-                }
-                if(save){
-                    writer.write(input_image);
-                }
-                        
+
+            if(show) {
+                cv::imshow("output",input_image);
+                cv::waitKey(5);
+            }
+            if(save){
+                writer.write(input_image);
             }
 
             end_time = std::chrono::high_resolution_clock::now();
@@ -221,19 +220,18 @@ int main(int argc, char* argv[]){
         
             if(ind_size>0){
                 vector<vector<float>> reslut = nms(conf,cls,bbox,ind_size);
-                vis(inputimage,reslut,output_name,show,save);
+                vis(inputimage,reslut);
             }
-            else
-            {
-                if(save){
-                    cv::imwrite(output_name,inputimage);
-                }
-                if(show) {
-                    cv::imshow("output",inputimage);
-                    cv::waitKey(0);
-                }
+
+            if(save){
+                cv::imwrite(output_name,inputimage);
+            }
+            if(show) {
+                cv::imshow("output",inputimage);
+                cv::waitKey(0);
+            }
                         
-            }
+
             end_time = std::chrono::high_resolution_clock::now();
             total = std::chrono::duration<float,std::milli>(end_time-start_time).count();
             std::cout<<"vis spend time "<<total<<" ms"<<std::endl;

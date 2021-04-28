@@ -1,4 +1,7 @@
 #include "resize.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
 
 __forceinline__ __device__ float3 get(uchar3* src, int x,int y,int w,int h){
     if(x < 0 || x>=w || y<0 || y>=h) return make_float3(0.,0.,0.);

@@ -1,4 +1,7 @@
 #include "mish.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
 
 __device__ float softplus_kernel(float x, const float threshold = 20) {
     if (x > threshold) return x;                // too large

@@ -1,4 +1,11 @@
 #include "post.h"
+#include "config.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include "thrust/sort.h"
+#include "thrust/count.h"
+#include "thrust/sequence.h"
+#include "thrust/execution_policy.h"
 
 struct is_morethan_thresh
 {

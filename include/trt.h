@@ -2,29 +2,14 @@
 #define __TRT_NET_H_
 
 #include <string>
-#include <iostream>
-#include <cstdlib>
-#include <memory>
-#include <fstream>
 #include <vector>
-#include <sstream>
-#include <opencv2/opencv.hpp>
-#include <NvOnnxConfig.h>
-#include <NvInfer.h>
-#include <NvOnnxParser.h>
-#include <numeric>
-#include <algorithm>
-#include "resize.h"
-#include "util.h"
-#include <NvInferPlugin.h>
-#include "post.h"
-#include "EntroyCalibrator.h"
-
-
+#include <memory>
+#include "NvInfer.h"
+#include "opencv2/opencv.hpp"
 
 namespace Tn{
-    using namespace std;
 
+    using namespace std;
 
     enum class RUN_MODE{
         FLOAT32 = 0,
