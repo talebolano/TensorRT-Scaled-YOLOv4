@@ -35,7 +35,6 @@ namespace track{
             int mtracklet_len;
             int mstart_frame;
             
-            bool is_activated;
             int mclasses;
             float mscores;
 

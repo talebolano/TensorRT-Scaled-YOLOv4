@@ -44,7 +44,7 @@ namespace track{
 
 
     STrack::STrack(vector<float> tlwh,float score,int classes)
-        :mtlwh(tlwh),mscores(score),mclasses(classes),is_activated(false),
+        :mtlwh(tlwh),mscores(score),mclasses(classes),
         mstate(TrackState::New){
 
     }
@@ -62,7 +62,6 @@ namespace track{
         mtracklet_len = 0;
         mstate = TrackState::Tracked;
 
-        is_activated = true;
         mframe_id = frame_id;
         mstart_frame = frame_id;
         vector<float> xyah = tlwh_to_xyah();
@@ -76,7 +75,6 @@ namespace track{
         mtracklet_len +=1;
         mstate = TrackState::Tracked;
         klmf::klmf_update(mean,covariance,det.tlwh_to_xyah());
-        is_activated = true;
         mframe_id = frame_id;
     }
 
@@ -85,7 +83,6 @@ namespace track{
         mtracklet_len +=1;
         mstate = TrackState::Tracked;
         klmf::klmf_update(mean,covariance,det.tlwh_to_xyah());
-        is_activated = true;
         mscores = det.mscores;
     }
 
