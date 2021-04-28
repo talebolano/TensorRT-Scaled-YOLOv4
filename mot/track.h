@@ -69,9 +69,6 @@ namespace track{
         vector<STrack> mtracked_stracks;
         vector<STrack> lost_stracks;
         vector<STrack> removed_stracks;
-
-        vector<STrack> join_starcks(vector<STrack>stracksa,vector<STrack>stracksb);
-        vector<STrack> sub_starcks(vector<STrack>stracksa,vector<STrack>stracksb);
         
     public:
         int max_time_lost;

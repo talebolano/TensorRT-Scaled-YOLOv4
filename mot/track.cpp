@@ -76,6 +76,7 @@ namespace track{
         mstate = TrackState::Tracked;
         klmf::klmf_update(mean,covariance,det.tlwh_to_xyah());
         mframe_id = frame_id;
+        mscores = det.mscores;
     }
 
     void STrack::update(const int frame_id,STrack det){
@@ -134,45 +135,6 @@ namespace track{
     {
     }
 
-    vector<STrack> SortedTracker::join_starcks(vector<STrack>stracksa,vector<STrack>stracksb){
-        map<int,int> exists;
-        vector<STrack> outs;
-        for(int i=0;i<stracksa.size();++i){
-            exists[stracksa[i].mtrack_id] = 1;
-            outs.push_back(stracksa[i]);
-        }
-        for(int i=0;i<stracksb.size();++i){
-            if(exists.find(stracksb[i].mtrack_id)==exists.end()){
-                exists[stracksb[i].mtrack_id] = 1;
-                outs.push_back(stracksb[i]);
-            }
-        }
-
-        return outs;
-    }
-
-    vector<STrack> SortedTracker::sub_starcks(vector<STrack>stracksa,vector<STrack>stracksb){
-        map<int,STrack> exists;
-        vector<STrack> outs;
-        for(int i=0;i<stracksa.size();++i){
-            exists.insert(pair<int,STrack>(stracksa[i].mtrack_id,stracksa[i]));
-        }        
-        for(int i=0;i<stracksb.size();++i){
-            if(exists.find(stracksb[i].mtrack_id)!=exists.end()){
-                exists.erase(stracksb[i].mtrack_id);
-            }
-        }
-
-        map<int,STrack>::iterator iter = exists.begin();
-        while (iter!=exists.end())
-        {
-            outs.push_back(iter->second);
-            iter++;
-        }
-        
-        return outs;
-    }
-
     vector<vector<float>> SortedTracker::update(vector<vector<float>> results){
         
         mframed_id +=1;
@@ -189,7 +151,10 @@ namespace track{
             dets.push_back(STrack(tlbr_to_tlwh(tlbr),score,classes));
         }
 
-        vector<STrack> strack_pool = join_starcks(mtracked_stracks,lost_stracks); //深拷贝
+        vector<STrack> strack_pool;
+        strack_pool.swap(mtracked_stracks);
+        strack_pool.insert(strack_pool.end(),lost_stracks.begin(),lost_stracks.end());
+
         mtracked_stracks.clear();
         lost_stracks.clear();
 
@@ -274,7 +239,6 @@ namespace track{
                     cost_matrix_2[i][j] = iou_distance(strack_pool[u_track[i]].get_tlbr(),dets[u_detection[j]].get_tlbr());
                 }
             }
-            //cout<<"after cost matrix"<<endl;
             map<int,int> matches_iou;
             vector<int> u_track_iou;
             vector<int> u_detection_iou;
@@ -296,8 +260,6 @@ namespace track{
             }
             map<int,int>::iterator matches_iouiter = matches_iou.begin();
 
-            //cout<<"after match"<<endl;
-
             while(matches_iouiter!=matches_iou.end()){
                 if(strack_pool[u_track[matches_iouiter->first]].mstate == TrackState::Tracked){
                     strack_pool[u_track[matches_iouiter->first]].update(mframed_id,dets[u_detection[matches_iouiter->second]]);//TrackState::activate
@@ -310,7 +272,6 @@ namespace track{
                 matches_iouiter++;
 
             }
-            //cout<<"after matches_iouiter"<<endl;
             
             vector<int> new_u_tracked;
             vector<int> new_u_detectioned;
@@ -328,7 +289,6 @@ namespace track{
 
 
         }
-        //cout<<"after second "<<endl;
 
         for(int i=0;i<u_track.size();++i){
             if(strack_pool[u_track[i]].mstate == TrackState::Tracked){
