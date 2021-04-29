@@ -137,11 +137,16 @@ void vis(cv::Mat &img,vector<vector<float>>result){
         int x2 = (int)((*iter)[2] - shiftX) * scaleX;
         int y2 = (int)((*iter)[3] - shiftY) * scaleY;
 
+        x1 = max(x1,0);
+        y1 = max(y1,0);
+        x2 = min(x2,oriW);
+        y2 = min(y2,oriH);
+
         cv::Rect bbox;
-        bbox.x = max(x1,0);
-        bbox.y = max(y1,0);
-        bbox.width = min(x2-x1,oriW);
-        bbox.height = min(y2-y1,oriH);
+        bbox.x = x1;
+        bbox.y = y1;
+        bbox.width = x2-x1;
+        bbox.height = y2-y1;
 
         int labelindex = (int)(*iter)[5];
         string showText = class_names[labelindex];
@@ -180,6 +185,11 @@ void plottrack(cv::Mat &img,vector<vector<float>>result){
         int y1 = (int)((*iter)[1] - shiftY) * scaleY;
         int x2 = (int)((*iter)[2] - shiftX) * scaleX;
         int y2 = (int)((*iter)[3] - shiftY) * scaleY;
+
+        x1 = max(x1,0);
+        y1 = max(y1,0);
+        x2 = min(x2,oriW);
+        y2 = min(y2,oriH);
 
         cv::Rect bbox;
         bbox.x = x1;
