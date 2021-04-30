@@ -15,19 +15,21 @@ int main(int argc, char *argv[]){ //ARGV[1]
         {"output-engine",required_argument,nullptr,'o'},
         {"mode",required_argument,nullptr,'m'},
         {"califile",required_argument,nullptr,'c'},
+        {"batch-size",required_argument,nullptr,'b'},
         {0,0,0,0}
     };
 
-    std::string onnx = "test.onnx";
-    std::string engine = "testFp16.engine";
+    string onnx = "test.onnx";
+    string engine = "testFp16.engine";
     Tn::RUN_MODE mode = Tn::RUN_MODE::FLOAT16;
-    std::string califile = "";
-    while ((opt = getopt_long_only(argc,argv,"i:o:m:c:",opts,&option_index))!=-1){
+    string califile = "";
+    int batchsize = 1;
+    while ((opt = getopt_long_only(argc,argv,"i:o:m:c:b:",opts,&option_index))!=-1){
         switch (opt)
         {
-        case 'i':onnx=std::string(optarg);
+        case 'i':onnx=string(optarg);
             break;
-        case 'o':engine=std::string(optarg);
+        case 'o':engine=string(optarg);
             break;    
         case 'm':{int a=atoi(optarg);
             switch (a){
@@ -41,18 +43,27 @@ int main(int argc, char *argv[]){ //ARGV[1]
                 break;
             };    
             break;}
-        case 'c':califile=std::string(optarg);
+        case 'c':califile=string(optarg);
+            break;
+        case 'b':batchsize=atoi(optarg);
+            break;
         default:
             break;
         }
     }
 
-    std::cout<<"input-onnx "<<onnx<<std::endl
-            <<"output-engine "<<engine<<std::endl;
+    cout<<"input-onnx "<<onnx<<endl
+            <<"output-engine "<<engine<<endl
+            <<"batchsize"<<batchsize<<endl;
+
+    if(batchsize<=0){
+        cerr<<"batch size can not less than zero"<<endl;
+        exit(1);
+    }
     
-    Tn::onnx2tensorrt net(onnx,1,califile,mode);
+    Tn::onnx2tensorrt net(onnx,1,califile,mode,batchsize);
     net.saveEngine(engine);
-    std::cout<<"save "<<engine<<std::endl;
+    cout<<"save "<<engine<<endl;
 
     return 0;
 

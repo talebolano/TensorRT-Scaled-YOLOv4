@@ -50,7 +50,7 @@ namespace Tn{
         return deviceMem;
     }
 
-    onnx2tensorrt::onnx2tensorrt(std::string &onnxfFile,int maxBatchSize,std::string &califilename,Tn::RUN_MODE mode){
+    onnx2tensorrt::onnx2tensorrt(std::string &onnxfFile,int maxBatchSize,std::string &califilename,Tn::RUN_MODE mode,int batchsize):mbatchsize(batchsize){
         cudaSetDevice(0);
         initMishPlugin();
         auto builder = nvUniquePtr<nvinfer1::IBuilder>(nvinfer1::createInferBuilder(gLogger.getTRTLogger()));
@@ -77,7 +77,7 @@ namespace Tn{
             static_cast<int>(gLogger.getReportableSeverity())
         );
         if(!parsed){
-            std::cout<<"failed to parse from "<<onnxfFile<<"!"<<std::endl;
+            std::cerr<<"failed to parse from "<<onnxfFile<<"!"<<std::endl;
             exit(EXIT_FAILURE);
         }
 
@@ -122,14 +122,14 @@ namespace Tn{
         initEngine();
         }
 
-    onnx2tensorrt::onnx2tensorrt(std::string &enginfFile){
+    onnx2tensorrt::onnx2tensorrt(std::string &enginfFile,int batchsize):mbatchsize(batchsize){
 
         cudaSetDevice(0);
         initMishPlugin();
         std::fstream file;
         file.open(enginfFile,std::ios::binary|std::ios::in);
         if(!file.is_open()){
-            std::cout<<"read engine "<<enginfFile<<" failed"<<std::endl;
+            std::cerr<<"read engine "<<enginfFile<<" failed"<<std::endl;
             return;
         }
         file.seekg(0,ios::end);
@@ -165,7 +165,7 @@ namespace Tn{
             file.open(filename,std::ios::binary | std::ios::out);
             if(!file.is_open())
             {
-                std::cout<<"read create file failed"<<std::endl;
+                std::cerr<<"read create file failed"<<std::endl;
                 file.close();
             }
             file.write((const char *)data->data(),data->size());

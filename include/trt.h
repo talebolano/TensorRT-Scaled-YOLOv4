@@ -30,8 +30,8 @@ namespace Tn{
         template <typename T>
         using nvUniquePtr = unique_ptr<T,InferDeleter>;
     public:
-        onnx2tensorrt(string &onnxfFile,int maxBatchSize,string &califilename, RUN_MODE mode=RUN_MODE::FLOAT16);
-        onnx2tensorrt(string &enginfFile);
+        onnx2tensorrt(string &onnxfFile,int maxBatchSize,string &califilename, RUN_MODE mode=RUN_MODE::FLOAT16,int batchsize=1);
+        onnx2tensorrt(string &enginfFile,int batchsize=1);
         ~onnx2tensorrt();
         onnx2tensorrt()=delete;
         int infer_gpupost(const cv::Mat &img,float*conf,float*cls,float*bbox);
@@ -43,7 +43,7 @@ namespace Tn{
         void* mCudaImg;
 
     private:
-;
+        int mbatchsize;
         nvinfer1::Dims mInputDims;
         shared_ptr<nvinfer1::IExecutionContext> mContext;
         shared_ptr<nvinfer1::ICudaEngine> mEngine;

@@ -42,7 +42,7 @@ class Detect(nn.Module):
                 bs = int(bs)
                 ny = int(ny)
                 nx = int(nx)
-                x[i] = x[i].view(bs, self.na, self.no, ny, nx).permute(0, 1, 3, 4, 2).contiguous()
+                x[i] = x[i].view(-1, self.na, self.no, ny, nx).permute(0, 1, 3, 4, 2).contiguous()
                 middle = int(self.na*ny*nx)
                 bs = int(bs)
 
@@ -55,10 +55,10 @@ class Detect(nn.Module):
                     y = x[i].sigmoid()
                     xy = (y[..., 0:2] * torch.tensor([2.]) - torch.tensor([0.5]) + grid) * torch.tensor([stride]).float()  # xy
                     wh = (y[..., 2:4] * torch.tensor([2.])) ** torch.tensor([2.]) * anchor_grid  # wh
-                    xy = xy.view(bs, middle, 2) 
-                    wh = wh.view(bs, middle, 2)
-                    conf = y[...,4:5].view(bs, middle, 1)
-                    cls = y[...,5:].view(bs, middle, self.nc)
+                    xy = xy.view(-1, middle, 2) 
+                    wh = wh.view(-1, middle, 2)
+                    conf = y[...,4:5].view(-1, middle, 1)
+                    cls = y[...,5:].view(-1, middle, self.nc)
 
                     xys.append(xy)
                     whs.append(wh)

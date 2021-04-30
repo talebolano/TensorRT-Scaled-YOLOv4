@@ -234,15 +234,15 @@ class YOLOLayer(nn.Module):
                     p += w[:, j:j + 1] * \
                          F.interpolate(out[self.layers[j]][:, :-n], size=[ny, nx], mode='bilinear', align_corners=False)
 
-        elif ONNX_EXPORT:
-            bs = 1  # batch size
+        # elif ONNX_EXPORT:
+        #     bs = 1  # batch size
         else:
             bs, _, ny, nx = p.shape  # bs, 255, 13, 13
             if (self.nx, self.ny) != (nx, ny):
                 self.create_grids((nx, ny), p.device)
 
         # p.view(bs, 255, 13, 13) -- > (bs, 3, 13, 13, 85)  # (bs, anchors, grid, grid, classes + xywh)
-        p = p.view(bs, self.na, self.no, self.ny, self.nx).permute(0, 1, 3, 4, 2).contiguous()  # prediction
+        p = p.view(-1, self.na, self.no, self.ny, self.nx).permute(0, 1, 3, 4, 2).contiguous()  # prediction
 
         if self.training:
             return p
@@ -251,10 +251,10 @@ class YOLOLayer(nn.Module):
             # Avoid broadcasting for ANE operations
             m = self.na * self.nx * self.ny
             ng = 1. / self.ng.repeat(m, 1)
-            grid = self.grid.repeat(1, self.na, 1, 1, 1).view(m, 2)
-            anchor_wh = self.anchor_wh.repeat(1, 1, self.nx, self.ny, 1).view(m, 2)
+            grid = self.grid.repeat(1, self.na, 1, 1, 1).view(1,m, 2)
+            anchor_wh = self.anchor_wh.repeat(1, 1, self.nx, self.ny, 1).view(1,m, 2)
 
-            p = p.view(m, self.no)
+            p = p.view(-1, m, self.no)
             io = p.sigmoid()
             xy = (io[..., :2] * torch.tensor([2.]) - torch.tensor([0.5]) + grid)
             wh = (io[..., 2:4] * torch.tensor([2.])) ** torch.tensor([2.]) * anchor_wh
@@ -358,8 +358,8 @@ class Darknet(nn.Module):
         if self.training:  # train
             return yolo_out
         elif ONNX_EXPORT:  # export
-            x = [torch.cat(x, 0) for x in zip(*yolo_out)]
-            return x[0], x[1],torch.cat(x[2:4], 1)  # scores, cls, boxes: 3780x80, 3780x4
+            x = [torch.cat(x, 1) for x in zip(*yolo_out)]
+            return x[0], x[1],torch.cat(x[2:4], 2)  # scores, cls, boxes: 3780x80, 3780x4
         else:  # inference or test
             x, p = zip(*yolo_out)  # inference output, training output
             x = torch.cat(x, 1)  # cat yolo outputs
