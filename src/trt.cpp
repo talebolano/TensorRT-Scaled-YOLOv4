@@ -194,7 +194,7 @@ namespace Tn{
         }
 
         mCudaImg = safeCudaMalloc(4096*4096*3*sizeof(uchar));
-        CUDA_CHECK(cudaStreamCreate(&mCudaStream));
+        CHECK(cudaStreamCreate(&mCudaStream));
         mInputDims = mEngine->getBindingDimensions(0);
 
         moutput.resize(mBindBufferSizes.size()-1);
@@ -209,7 +209,7 @@ namespace Tn{
     int onnx2tensorrt::infer_gpupost(const cv::Mat &img,float*conf,float*cls,float*bbox){
         bool keepRation=1,keepCenter=1;
         int ind_size;
-        CUDA_CHECK(cudaMemcpy(mCudaImg,img.data,img.step[0]*img.rows,cudaMemcpyHostToDevice));
+        CHECK(cudaMemcpy(mCudaImg,img.data,img.step[0]*img.rows,cudaMemcpyHostToDevice));
         resizeAndNorm(mCudaImg,(float*)mCudaBuffers[0],img.cols,img.rows,mInputDims.d[3],mInputDims.d[2],keepRation,keepCenter);
         mContext->executeV2(&mCudaBuffers[0]);
         cudaDeviceSynchronize();
@@ -225,10 +225,10 @@ namespace Tn{
         cudaStreamDestroy(mCudaStream);
         mContext.reset();
         for(size_t bindindIdx=0;bindindIdx<mBindBufferSizes.size();++bindindIdx){
-            if(mCudaBuffers[bindindIdx])CUDA_CHECK(cudaFree(mCudaBuffers[bindindIdx]));
+            if(mCudaBuffers[bindindIdx])CHECK(cudaFree(mCudaBuffers[bindindIdx]));
 
         }
-        if(mCudaImg)CUDA_CHECK(cudaFree(mCudaImg));
+        if(mCudaImg)CHECK(cudaFree(mCudaImg));
         
     }
 

@@ -17,7 +17,7 @@ namespace nvinfer1{
         mInputCount = mbatchsize*inputsize[0]*inputsize[1]*3;// b*c*h*w
 
         mCurBatchIdx = 0;
-        CUDA_CHECK(cudaMalloc(&mDeviceInput,mInputCount*sizeof(float) )) ;
+        CHECK(cudaMalloc(&mDeviceInput,mInputCount*sizeof(float) )) ;
 
     }
     INt8EntroyCalibrator::~INt8EntroyCalibrator(){
@@ -31,18 +31,18 @@ namespace nvinfer1{
         }
 
         void* g_temp_img;
-        CUDA_CHECK(cudaMalloc(&g_temp_img,inputsize[0]*inputsize[1]*3*sizeof(uchar)));
+        CHECK(cudaMalloc(&g_temp_img,inputsize[0]*inputsize[1]*3*sizeof(uchar)));
 
         for(auto iter = mdata.begin()+mCurBatchIdx;iter!=mdata.begin()+mCurBatchIdx+mbatchsize;++iter){
             int i = 0 ;
             
-            CUDA_CHECK(cudaMemcpy(g_temp_img,iter->data,mbatchsize*inputsize[0]*inputsize[1]*3*sizeof(uchar),cudaMemcpyHostToDevice)); // uchar hwc -> float chw
+            CHECK(cudaMemcpy(g_temp_img,iter->data,mbatchsize*inputsize[0]*inputsize[1]*3*sizeof(uchar),cudaMemcpyHostToDevice)); // uchar hwc -> float chw
 
             resizeAndNorm(g_temp_img,(float*)mDeviceInput+i*mbatchsize*inputsize[0]*inputsize[1]*3,iter->cols,iter->rows,inputsize[0],inputsize[1],0,0);
             cudaDeviceSynchronize();
             i +=1;
         }
-        CUDA_CHECK(cudaFree(g_temp_img));
+        CHECK(cudaFree(g_temp_img));
         bindings[0] = mDeviceInput;
         
         std::cout<<"load batch "<<mCurBatchIdx<<" to "<<mCurBatchIdx+mbatchsize-1<<std::endl;

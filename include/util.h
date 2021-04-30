@@ -19,17 +19,6 @@
     } while (0)                                                                     
 #endif
 
-#ifndef CUDA_CHECK
-#define CUDA_CHECK(callstr)                                                          \
-{                                                                                    \
-    cudaError_t error_code = callstr;                                                \
-    if(error_code!=cudaSuccess){                                                     \
-        std::cerr<<"CUDA err"<<cudaGetErrorString(error_code)<<"at"<<__FILE__<<":"<<__LINE__; \
-        assert(0);                                                                   \
-    }                                                                                \
-}    
-#endif
-
 class Logger : public nvinfer1::ILogger
 {
 public:
