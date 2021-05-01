@@ -30,12 +30,11 @@ namespace Tn{
         template <typename T>
         using nvUniquePtr = unique_ptr<T,InferDeleter>;
     public:
-        onnx2tensorrt(string &onnxfFile,int maxBatchSize,string &califilename, RUN_MODE mode=RUN_MODE::FLOAT16,int batchsize=1);
+        onnx2tensorrt(string &onnxfFile,string &califilename, RUN_MODE mode=RUN_MODE::FLOAT16,int batchsize=1);
         onnx2tensorrt(string &enginfFile,int batchsize=1);
         ~onnx2tensorrt();
         onnx2tensorrt()=delete;
-        int infer_gpupost(const cv::Mat &img,float*conf,float*cls,float*bbox);
-
+        vector<int> infer_gpupost(const vector<cv::Mat> &imgs,vector<vector<float>>conf,vector<vector<float>>cls,vector<vector<float>>bbox);
         void saveEngine(string& filename);
         vector<void *> mCudaBuffers;
         vector<size_t> mBindBufferSizes;

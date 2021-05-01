@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){ //ARGV[1]
         exit(1);
     }
     
-    Tn::onnx2tensorrt net(onnx,1,califile,mode,batchsize);
+    Tn::onnx2tensorrt net(onnx,califile,mode,batchsize);
     net.saveEngine(engine);
     cout<<"save "<<engine<<endl;
 

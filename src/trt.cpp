@@ -50,7 +50,7 @@ namespace Tn{
         return deviceMem;
     }
 
-    onnx2tensorrt::onnx2tensorrt(std::string &onnxfFile,int maxBatchSize,std::string &califilename,Tn::RUN_MODE mode,int batchsize):mbatchsize(batchsize){
+    onnx2tensorrt::onnx2tensorrt(std::string &onnxfFile,std::string &califilename,Tn::RUN_MODE mode,int batchsize):mbatchsize(batchsize){
         cudaSetDevice(0);
         initMishPlugin();
         auto builder = nvUniquePtr<nvinfer1::IBuilder>(nvinfer1::createInferBuilder(gLogger.getTRTLogger()));
@@ -81,12 +81,12 @@ namespace Tn{
             exit(EXIT_FAILURE);
         }
 
-        builder->setMaxBatchSize(maxBatchSize);
+        //builder->setMaxBatchSize(maxBatchSize);
         config->setMaxWorkspaceSize(1<<30);
 
         nvinfer1::INt8EntroyCalibrator *calibrator = nullptr;
 
-        if(califilename.size()>0)  calibrator = new nvinfer1::INt8EntroyCalibrator(maxBatchSize,califilename,std::string("calib.table"));
+        if(califilename.size()>0)  calibrator = new nvinfer1::INt8EntroyCalibrator(1,califilename,std::string("calib.table"));
 
         if(mode==RUN_MODE::INT8){
             std::cout<<"INT8 mode "<<std::endl;
@@ -98,6 +98,12 @@ namespace Tn{
             std::cout<<"FP16 mode "<<std::endl;
         }
         else std::cout<<"FP32 mode "<<std::endl;
+
+        auto profileCalib = builder->createOptimizationProfile();
+        profileCalib->setDimensions("input", nvinfer1::OptProfileSelector::kMIN, Dims4{1, 3, inputsize[0], inputsize[1]});
+        profileCalib->setDimensions("input", nvinfer1::OptProfileSelector::kOPT, Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
+        profileCalib->setDimensions("input", nvinfer1::OptProfileSelector::kMAX, Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
+        config->setCalibrationProfile(profileCalib);
 
 
         mEngine = std::shared_ptr<nvinfer1::ICudaEngine>(
@@ -175,7 +181,6 @@ namespace Tn{
     }
 
     void onnx2tensorrt::initEngine(){
-        const int maxBatchSize = mEngine->getMaxBatchSize();
         mContext = std::shared_ptr<nvinfer1::IExecutionContext>(mEngine->createExecutionContext(),InferDeleter());
 
         assert(mContext!=nullptr);
@@ -187,8 +192,8 @@ namespace Tn{
         for(int i=0;i<nbBindings;++i){
 
             nvinfer1::DataType dtype = mEngine->getBindingDataType(i);
-            int totalSize = maxBatchSize*volume(mEngine->getBindingDimensions(i))*getElementSize(dtype);//
-
+            int totalSize = abs(mbatchsize*volume(mEngine->getBindingDimensions(i))*getElementSize(dtype));//
+            assert(totalSize>0);
             mBindBufferSizes[i] = totalSize;
             mCudaBuffers[i] = safeCudaMalloc(totalSize);   
         }
@@ -206,14 +211,20 @@ namespace Tn{
         return;
     }
 
-    int onnx2tensorrt::infer_gpupost(const cv::Mat &img,float*conf,float*cls,float*bbox){
+    vector<int> onnx2tensorrt::infer_gpupost(const vector<cv::Mat> &imgs,vector<vector<float>>conf,vector<vector<float>>cls,vector<vector<float>>bbox){
         bool keepRation=1,keepCenter=1;
-        int ind_size;
-        CHECK(cudaMemcpy(mCudaImg,img.data,img.step[0]*img.rows,cudaMemcpyHostToDevice));
-        resizeAndNorm(mCudaImg,(float*)mCudaBuffers[0],img.cols,img.rows,mInputDims.d[3],mInputDims.d[2],keepRation,keepCenter);
+        vector<int> ind_size;
+        const int batchsize = imgs.size();
+        mInputDims.d[0] = batchsize;
+        mContext->setBindingDimensions(0,mInputDims);
+
+        vector<float> inputData = processing(imgs,keepRation,keepCenter); // bhwc -->bchw
+        CHECK(cudaMemcpy(mCudaImg,inputData.data(),inputData.size()*sizeof(float),cudaMemcpyHostToDevice));
+
+        //resizeAndNorm(mCudaImg,(float*)mCudaBuffers[0],img.cols,img.rows,mInputDims.d[3],mInputDims.d[2],keepRation,keepCenter);
         mContext->executeV2(&mCudaBuffers[0]);
         cudaDeviceSynchronize();
-        ind_size = post_gpu((float*)moutput[0],(float*)moutput[1],(float*)moutput[2],
+        ind_size = post_gpu(batchsize,(float*)moutput[0],(float*)moutput[1],(float*)moutput[2],
                             conf,cls,bbox);
 
         return ind_size;

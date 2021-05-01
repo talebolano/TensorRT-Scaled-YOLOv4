@@ -51,13 +51,10 @@ int main(int argc, char* argv[]){
 
     Tn::onnx2tensorrt net(engine,batchsize);
 
-    float*conf=NULL;
-    float*cls=NULL;
-    float*bbox=NULL;
-    conf = (float*)calloc(max_per_img,sizeof(float));
-    cls = (float*)calloc(max_per_img*classes,sizeof(float));
-    bbox = (float*)calloc(max_per_img*4,sizeof(float));
-    int ind_size;
+    vector<vector<float>> conf;
+    vector<vector<float>> cls;
+    vector<vector<float>> bbox;
+    vector<int> ind_size;
 
 
     if (inputs.find("mp4") != string::npos || inputs.find("avi") != string::npos)
@@ -72,8 +69,9 @@ int main(int argc, char* argv[]){
         }        
         int h = cap.get(4);
         int w = cap.get(3);
+        int fps = cap.get(CV_CAP_PROP_FPS);
 
-        cv::VideoWriter writer(output_name,cv::VideoWriter::fourcc('X','V','I','D'),30,cv::Size(w,h));
+        cv::VideoWriter writer(output_name,cv::VideoWriter::fourcc('X','V','I','D'),fps,cv::Size(w,h));
 
         if(show){
             cv::namedWindow("output",0);
@@ -81,58 +79,49 @@ int main(int argc, char* argv[]){
         }
         
         cv::Mat input_image;
-        while (cap.read(input_image))
+        bool ret = true;
+        while (ret)
         {
+            vector<cv::Mat> inputImgs;
+
+            for(int b=0;b<batchsize;++b){
+                ret = cap.read(input_image);
+                if(ret){
+                    inputImgs.push_back(input_image);
+                }
+                else{
+                    break;
+                }
+                
+            }
+
+            ind_size = net.infer_gpupost(inputImgs,conf,cls,bbox);
             
+            for(int b=0;b<batchsize;++b){
+                string output_name = output+".jpg";
+                vector<vector<float>> reslut = nms(conf[b],cls[b],bbox[b],ind_size[b]);
+                vis(inputImgs[b],reslut);
+                if(save){
+                    cv::imwrite(output_name,inputImgs[b]);
+                    }
+                if(show) {
+                    cv::imshow("output",inputImgs[b]);
+                    cv::waitKey(0);
+                }
 
-            if(!input_image.data){
-                continue;
-            }
-            auto start_time = chrono::high_resolution_clock::now();
-            cv::Mat rgb;
-            cv::cvtColor(input_image,rgb,CV_BGR2RGB);
-
-            auto end_time = chrono::high_resolution_clock::now();
-            float total = chrono::duration<float,milli>(end_time-start_time).count();
-            cout<<"process spend time "<<total<<" ms"<<endl;
-
-            start_time = chrono::high_resolution_clock::now();
-            ind_size = net.infer_gpupost(rgb,conf,cls,bbox);
-
-            end_time = chrono::high_resolution_clock::now();
-            total = chrono::duration<float,milli>(end_time-start_time).count();
-            cout<<"infer spend time "<<total<<" ms"<<endl;
-
-            //后处理
-            start_time = chrono::high_resolution_clock::now();
-            
-            if(ind_size>0){
-                vector<vector<float>> reslut = nms(conf,cls,bbox,ind_size);
-                vis(input_image,reslut);
             }
 
-            if(show) {
-                cv::imshow("output",input_image);
-                cv::waitKey(5);
-            }
-            if(save){
-                writer.write(input_image);
-            }
 
-            end_time = chrono::high_resolution_clock::now();
-            total = chrono::duration<float,milli>(end_time-start_time).count();
-            cout<<"vis spend time "<<total<<" ms"<<endl;
-            }
+        }
 
         cv::destroyAllWindows();
         cap.release();
         
     }
-    else if (inputs.find("txt") != string::npos )
-    {
+    else if (inputs.find("txt") != string::npos ){
         cout<<"read image list "<<inputs<<endl;
         ifstream inputImageNameList(inputs);
-        list<string> fileNames;
+        vector<string> fileNames;
 
         if(!inputImageNameList.is_open()){
             cout<<"can not read image list "<<inputs<<endl;
@@ -145,46 +134,40 @@ int main(int argc, char* argv[]){
         }
         inputImageNameList.close();
 
-        for(auto it=fileNames.begin();it!=fileNames.end();++it){
+        int imageNum = fileNames.size();
+        int epochs = imageNum / batchsize + 1;
+        int lastbatchsize = imageNum % batchsize;
+        int nowbatchsize;
+        if(show){
+            cv::namedWindow("output",0);
 
-            auto start_time = chrono::high_resolution_clock::now();
-            cv::Mat inputimage = cv::imread(*it);
-            cv::Mat rgb;
-            cv::cvtColor(inputimage,rgb,CV_BGR2RGB);
-
-            auto end_time = chrono::high_resolution_clock::now();
-            float total = chrono::duration<float,milli>(end_time-start_time).count();
-            cout<<"process spend time "<<total<<" ms"<<endl;
-
-            start_time = chrono::high_resolution_clock::now();
-            ind_size = net.infer_gpupost(rgb,conf,cls,bbox);
-
-            end_time = chrono::high_resolution_clock::now();
-            total = chrono::duration<float,milli>(end_time-start_time).count();
-            cout<<"infer spend time "<<total<<" ms"<<endl;
-
-            start_time = chrono::high_resolution_clock::now();
-
-            string output_name = output+".jpg";
-            if(show){cv::namedWindow("output",1);}
-        
-            if(ind_size>0){
-                vector<vector<float>> reslut = nms(conf,cls,bbox,ind_size);
-                vis(inputimage,reslut);
+        }
+        for(int e=0;e<epochs;++e){
+            vector<cv::Mat> inputImgs;
+            if(e==epochs-1){
+                nowbatchsize == lastbatchsize;
             }
 
-            if(save){
-                cv::imwrite(output_name,inputimage);
-            }
-            if(show) {
-                cv::imshow("output",inputimage);
-                cv::waitKey(0);
-            }
-                        
+            for(int b=0;b<nowbatchsize;++b){
+                cv::Mat inputimage = cv::imread(fileNames[e*batchsize+b]);
+                inputImgs.push_back(inputimage);
 
-            end_time = chrono::high_resolution_clock::now();
-            total = chrono::duration<float,milli>(end_time-start_time).count();
-            cout<<"vis spend time "<<total<<" ms"<<endl;
+            }
+            ind_size = net.infer_gpupost(inputImgs,conf,cls,bbox);
+
+            for(int b=0;b<nowbatchsize;++b){
+                string output_name = output+".jpg";
+                vector<vector<float>> reslut = nms(conf[b],cls[b],bbox[b],ind_size[b]);
+                vis(inputImgs[b],reslut);
+                if(save){
+                    cv::imwrite(output_name,inputImgs[b]);
+                    }
+                if(show) {
+                    cv::imshow("output",inputImgs[b]);
+                    cv::waitKey(0);
+                }
+
+            }
 
         }
         cv::destroyAllWindows();
@@ -195,9 +178,6 @@ int main(int argc, char* argv[]){
     {
         cout<<"do not support this format,please use file end with .mp4/.avi/.jpg/.png"<<endl;
     }
-    free(conf);
-    free(cls);
-    free(bbox);
 
 
     cout<<"success all"<< endl;

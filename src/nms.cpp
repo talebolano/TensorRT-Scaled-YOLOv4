@@ -50,7 +50,7 @@ cv::Scalar labelColor(int label){
     return cv::Scalar(r,g,b);
 }
 
-vector<vector<float>> nms(float*conf,float*cls,float*bbox, int ind_size){
+vector<vector<float>> nms(vector<float>conf,vector<float>cls,vector<float>bbox, int ind_size){
 
     vector<vector<vector<float>>> nms_bbox_conf_cls; // class num 6
 

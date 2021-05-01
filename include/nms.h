@@ -6,7 +6,7 @@
 #include "opencv2/opencv.hpp"
 
 
-std::vector<std::vector<float>> nms(float*conf,float*cls,float*bbox, int ind_size);
+std::vector<std::vector<float>> nms(std::vector<float>conf,std::vector<float>cls,std::vector<float>bbox, int ind_size);
 void vis(cv::Mat &img,std::vector<std::vector<float>>result);
 void plottrack(cv::Mat &img,std::vector<std::vector<float>>result);
 
