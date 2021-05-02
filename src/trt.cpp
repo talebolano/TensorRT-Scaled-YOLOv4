@@ -80,6 +80,12 @@ namespace Tn{
             std::cerr<<"failed to parse from "<<onnxfFile<<"!"<<std::endl;
             exit(EXIT_FAILURE);
         }
+        auto input = network->getInput(0);
+        auto profileCalib = builder->createOptimizationProfile();
+        profileCalib->setDimensions(input->getName(), nvinfer1::OptProfileSelector::kMIN, nvinfer1::Dims4{1, 3, inputsize[0], inputsize[1]});
+        profileCalib->setDimensions(input->getName(), nvinfer1::OptProfileSelector::kOPT, nvinfer1::Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
+        profileCalib->setDimensions(input->getName(), nvinfer1::OptProfileSelector::kMAX, nvinfer1::Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
+        config->setCalibrationProfile(profileCalib);
 
         //builder->setMaxBatchSize(maxBatchSize);
         config->setMaxWorkspaceSize(1<<30);
@@ -98,13 +104,6 @@ namespace Tn{
             std::cout<<"FP16 mode "<<std::endl;
         }
         else std::cout<<"FP32 mode "<<std::endl;
-
-        auto profileCalib = builder->createOptimizationProfile();
-        profileCalib->setDimensions("input", nvinfer1::OptProfileSelector::kMIN, Dims4{1, 3, inputsize[0], inputsize[1]});
-        profileCalib->setDimensions("input", nvinfer1::OptProfileSelector::kOPT, Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
-        profileCalib->setDimensions("input", nvinfer1::OptProfileSelector::kMAX, Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
-        config->setCalibrationProfile(profileCalib);
-
 
         mEngine = std::shared_ptr<nvinfer1::ICudaEngine>(
             builder->buildEngineWithConfig(*network,*config),InferDeleter());
