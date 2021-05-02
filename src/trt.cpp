@@ -198,8 +198,6 @@ namespace Tn{
             mCudaBuffers[i] = safeCudaMalloc(totalSize);   
         }
 
-        mCudaImg = safeCudaMalloc(4096*4096*3*sizeof(uchar));
-        CHECK(cudaStreamCreate(&mCudaStream));
         mInputDims = mEngine->getBindingDimensions(0);
 
         moutput.resize(mBindBufferSizes.size()-1);
@@ -211,20 +209,19 @@ namespace Tn{
         return;
     }
 
-    vector<int> onnx2tensorrt::infer_gpupost(const vector<cv::Mat> &imgs,vector<vector<float>>conf,vector<vector<float>>cls,vector<vector<float>>bbox){
+    vector<int> onnx2tensorrt::infer_gpupost(const vector<cv::Mat> &imgs,vector<vector<float>> &conf,vector<vector<float>> &cls,vector<vector<float>> &bbox){
         bool keepRation=1,keepCenter=1;
-        vector<int> ind_size;
         const int batchsize = imgs.size();
         mInputDims.d[0] = batchsize;
         mContext->setBindingDimensions(0,mInputDims);
 
         vector<float> inputData = processing(imgs,keepRation,keepCenter); // bhwc -->bchw
-        CHECK(cudaMemcpy(mCudaImg,inputData.data(),inputData.size()*sizeof(float),cudaMemcpyHostToDevice));
+        CHECK(cudaMemcpy(mCudaBuffers[0],inputData.data(),inputData.size()*sizeof(float),cudaMemcpyHostToDevice));
 
         //resizeAndNorm(mCudaImg,(float*)mCudaBuffers[0],img.cols,img.rows,mInputDims.d[3],mInputDims.d[2],keepRation,keepCenter);
         mContext->executeV2(&mCudaBuffers[0]);
         cudaDeviceSynchronize();
-        ind_size = post_gpu(batchsize,(float*)moutput[0],(float*)moutput[1],(float*)moutput[2],
+        vector<int> ind_size = post_gpu(batchsize,(float*)moutput[0],(float*)moutput[1],(float*)moutput[2],
                             conf,cls,bbox);
 
         return ind_size;
@@ -232,14 +229,12 @@ namespace Tn{
     }
 
     onnx2tensorrt::~onnx2tensorrt(){
-        cudaStreamSynchronize(mCudaStream);
-        cudaStreamDestroy(mCudaStream);
+
         mContext.reset();
         for(size_t bindindIdx=0;bindindIdx<mBindBufferSizes.size();++bindindIdx){
             if(mCudaBuffers[bindindIdx])CHECK(cudaFree(mCudaBuffers[bindindIdx]));
 
         }
-        if(mCudaImg)CHECK(cudaFree(mCudaImg));
         
     }
 

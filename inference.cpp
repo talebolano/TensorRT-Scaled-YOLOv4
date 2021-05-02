@@ -106,7 +106,7 @@ int main(int argc, char* argv[]){
                     }
                 if(show) {
                     cv::imshow("output",inputImgs[b]);
-                    cv::waitKey(0);
+                    cv::waitKey(5);
                 }
 
             }

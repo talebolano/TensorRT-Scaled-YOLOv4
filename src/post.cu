@@ -35,7 +35,7 @@ __global__ void postKernel(float* cls,float* bbox,int*g_temp_index,float*out_cls
 
 using namespace std;
 vector<int> post_gpu(const int batchsize,float*conf,float*cls,float*bbox,
-            vector<vector<float>>out_conf,vector<vector<float>>out_cls,vector<vector<float>>out_bbox){
+            vector<vector<float>> &out_conf,vector<vector<float>> &out_cls,vector<vector<float>> &out_bbox){
     /*
     排序后去除小于阈值的，并对 cls 和 bbox 进行排序
     并拷贝到cpu conf cls bbox

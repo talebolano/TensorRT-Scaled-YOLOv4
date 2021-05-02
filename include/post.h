@@ -4,5 +4,5 @@
 #include <vector>
 
 std::vector<int> post_gpu(const int batchsize,float*conf,float*cls,float*bbox,
-            std::vector<std::vector<float>>out_conf,std::vector<std::vector<float>>out_cls,std::vector<std::vector<float>>out_bbox);
+            std::vector<std::vector<float>> &out_conf,std::vector<std::vector<float>> &out_cls,std::vector<std::vector<float>> &out_bbox);
 #endif

@@ -34,16 +34,14 @@ namespace Tn{
         onnx2tensorrt(string &enginfFile,int batchsize=1);
         ~onnx2tensorrt();
         onnx2tensorrt()=delete;
-        vector<int> infer_gpupost(const vector<cv::Mat> &imgs,vector<vector<float>>conf,vector<vector<float>>cls,vector<vector<float>>bbox);
+        vector<int> infer_gpupost(const vector<cv::Mat> &imgs,vector<vector<float>> &conf,vector<vector<float>> &cls,vector<vector<float>> &bbox);
         void saveEngine(string& filename);
-        vector<void *> mCudaBuffers;
-        vector<size_t> mBindBufferSizes;
-        cudaStream_t mCudaStream;
-        void* mCudaImg;
 
     private:
         int mbatchsize;
         nvinfer1::Dims mInputDims;
+        vector<void *> mCudaBuffers;
+        vector<size_t> mBindBufferSizes;
         shared_ptr<nvinfer1::IExecutionContext> mContext;
         shared_ptr<nvinfer1::ICudaEngine> mEngine;
         vector<float* > moutput;
