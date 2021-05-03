@@ -94,15 +94,16 @@ int main(int argc, char* argv[]){
                 }
                 
             }
+            const int nowbatchsize = inputImgs.size();
 
             ind_size = net.infer_gpupost(inputImgs,conf,cls,bbox);
             
-            for(int b=0;b<batchsize;++b){
+            for(int b=0;b<nowbatchsize;++b){
                 string output_name = output+".jpg";
                 vector<vector<float>> reslut = nms(conf[b],cls[b],bbox[b],ind_size[b]);
                 vis(inputImgs[b],reslut);
                 if(save){
-                    cv::imwrite(output_name,inputImgs[b]);
+                    writer.write(inputImgs[b]);
                     }
                 if(show) {
                     cv::imshow("output",inputImgs[b]);
