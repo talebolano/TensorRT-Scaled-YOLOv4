@@ -9,6 +9,6 @@ include_directories(
 
 link_directories(${OpenCV_LIBRARIES_DIRS})
 # set(CUDA_NVCC_FLAGS "-D_FORCE_INLINES -Xcompiler -fPIC")
-set(SRC_LIST resize.cu post.cu nms.cpp EntroyCalibrator.cpp trt.cpp )
+set(SRC_LIST resize.cu resize.cpp post.cu nms.cpp EntroyCalibrator.cpp trt.cpp )
 add_library(Tnyolo SHARED ${SRC_LIST} )
 target_link_libraries(Tnyolo ${TENSORRT_INFER} ${TENSORRT_ONNX} ${TENSORRT_PLUGIN} ${OpenCV_LIBS} Mish_plugin)
