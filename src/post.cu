@@ -74,7 +74,7 @@ vector<int> post_gpu(const int batchsize,float*conf,float*cls,float*bbox,
 
 
             postKernel<<<gridSize,blockSize>>>(cls+classes*batchsize*yolo_size,bbox+4*batchsize*yolo_size,
-                                        g_temp_index,out_cls_gpu,out_bbox_gpu,ind_size);
+                                        g_temp_index,out_cls_gpu,out_bbox_gpu,ind_size[i]);
             cudaDeviceSynchronize();
 
             cudaMemcpy(out_conf[i].data(),conf,ind_size[i]*sizeof(float),cudaMemcpyDeviceToHost);

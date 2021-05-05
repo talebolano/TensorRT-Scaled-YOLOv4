@@ -85,7 +85,8 @@ namespace Tn{
         profileCalib->setDimensions(input->getName(), nvinfer1::OptProfileSelector::kMIN, nvinfer1::Dims4{1, 3, inputsize[0], inputsize[1]});
         profileCalib->setDimensions(input->getName(), nvinfer1::OptProfileSelector::kOPT, nvinfer1::Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
         profileCalib->setDimensions(input->getName(), nvinfer1::OptProfileSelector::kMAX, nvinfer1::Dims4{mbatchsize, 3, inputsize[0], inputsize[1]});
-        config->setCalibrationProfile(profileCalib);
+        config->addOptimizationProfile(profileCalib);
+
 
         //builder->setMaxBatchSize(maxBatchSize);
         config->setMaxWorkspaceSize(1<<30);
